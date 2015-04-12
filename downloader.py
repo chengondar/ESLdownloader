@@ -32,13 +32,13 @@ def main():
 
     for pod in range(latest_pod):
         url = pod_base_url + pod + suffix
-        code = os.system("axel -n 5" + url)
+        code = os.system("timeout 600 axel -n 5" + url)
         # if code == '256':
         #     break
 
     for cafe in range(latest_cafe):
         url = cafe_base_url + cafe + suffix
-        code = os.system("axel -n 5" + url)
+        code = os.system("timeout 600 axel -n 5" + url)
         # if code == '256':
         #     break
 
