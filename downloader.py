@@ -1,6 +1,7 @@
 import ConfigParser
 import requests
 import os
+from oss.oss_api import *
 MAX = 2000
 
 def get_rss(url):
@@ -30,6 +31,12 @@ def main():
     cafe_base_url = base_url + cf.get("esl", "cafe_pre")
     suffix = cf.get("esl", "suffix")
     mode = cf.get("local", "mode")
+    
+    endpoint = cf.get("oss", "endpoint")
+    bucket = cf.get("oss", "bucket")
+    accessid = os.environ.get("OSS_ACCESSID")
+    accesskey = os.environ.get("OSS_ACCESSKEY")
+    oss = OssAPI(endpoint, accessid, accesskey)
 
     if mode == "batch":
         esllist = cf.get("local", "esllist").strip().split(",")
@@ -40,18 +47,31 @@ def main():
             url = pod_base_url + str(pod) + suffix
             print "download " + url
             code = os.system("timeout 500 axel -n 10 " + url)
+            print code
+            if code == 0:
+                oss.put_object_from_file(bucket, "ESLPod" + str(pod) + suffix,"ESLPod" + str(pod) + suffix)
         for cafe in cafelist:
             url = cafe_base_url + str(cafe) + suffix
             code = os.system("timeout 500 axel -n 10 " + url)
+            print code
+            if code == 0:
+                oss.put_object_from_file(bucket, "EC" + str(cafe) + suffix,"EC" + str(cafe) + suffix)
 
     if mode == "all":
         for pod in range(latest_pod):
             url = pod_base_url + str(pod) + suffix
             print "download " + url
             code = os.system("timeout 500 axel -n 10 " + url)
+            if code == 0:
+                oss.put_object_from_file(bucket, "ESLPod" + str(pod) + suffix,"ESLPod" + str(pod) + suffix)
+
         for cafe in range(latest_cafe):
             url = cafe_base_url + str(cafe) + suffix
             code = os.system("timeout 500 axel -n 10 " + url)
+            if code == 0:
+                oss.put_object_from_file(bucket, "EC" + str(cafe) + suffix,"EC" + str(cafe) + suffix)
+
+
 
 
 
